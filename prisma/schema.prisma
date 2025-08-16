@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Note: Users are managed by Supabase Auth, so no custom User model is needed
+
+model Activity {
+  id              String    @id @default(cuid())
+  title           String
+  description     String
+  location        String
+  price           Float
+  available_slots Int
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  
+  bookings        Booking[]
+
+  @@map("activities")
+}
+
+model Booking {
+  id           String   @id @default(cuid())
+  user_id      String   // References Supabase Auth user ID
+  activity_id  String
+  booking_date DateTime // Date when the user wants to book the activity
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  
+  activity Activity @relation(fields: [activity_id], references: [id])
+
+  @@map("bookings")
+}
