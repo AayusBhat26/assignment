@@ -18,19 +18,13 @@ export async function GET(request: NextRequest) {
     let query = supabase
       .from('activities')
       .select('*')
-      .gte('available_slots', 1) // Only show activities with available slots
-
-    // Apply search filter
+      .gte('available_slots', 1) 
     if (search) {
       query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`)
     }
-
-    // Apply location filter
     if (location) {
       query = query.ilike('location', `%${location}%`)
     }
-
-    // Apply price filter
     if (price && price !== 'all') {
       switch (price) {
         case '0-25':
@@ -47,8 +41,6 @@ export async function GET(request: NextRequest) {
           break
       }
     }
-
-    // Apply sorting
     switch (sort) {
       case 'price_low':
         query = query.order('price', { ascending: true })
@@ -65,7 +57,6 @@ export async function GET(request: NextRequest) {
         break
     }
 
-    // Apply pagination
     const offset = (page - 1) * limit
     query = query.range(offset, offset + limit - 1)
 
